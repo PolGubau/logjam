@@ -21,6 +21,7 @@ import type {
 
 import appStylesHref from "./app.css?url";
 import { useEffect } from "react";
+import { Button, Input, Link, PoluiProvider, Toaster } from "pol-ui";
 
 //
 export const action = async () => {
@@ -82,75 +83,85 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <aside id="sidebar">
-          <h1>Remix Contacts</h1>
-          <div>
-            <Form
-              id="search-form"
-              role="search"
-              onChange={(event) => {
-                const isFirstSearch = q === null;
-                submit(event.currentTarget, {
-                  replace: !isFirstSearch,
-                });
-              }}
-            >
-              <input
-                id="q"
-                defaultValue={q || ""}
-                aria-label="Search contacts"
-                className={searching ? "loading" : ""}
-                placeholder="Search"
-                type="search"
-                name="q"
-              />
-              <div aria-hidden hidden={!searching} id="search-spinner" />
-              <div id="search-spinner" aria-hidden hidden={true} />
-            </Form>
-            <Form method="post">
-              <button type="submit">New</button>
-            </Form>
+        <PoluiProvider>
+          <aside id="sidebar">
+            <h1>
+              <Link href="/">Logjam</Link>
+            </h1>
+            <div>
+              <Form
+                id="search-form"
+                role="search"
+                onChange={(event) => {
+                  const isFirstSearch = q === null;
+                  submit(event.currentTarget, {
+                    replace: !isFirstSearch,
+                  });
+                }}
+              >
+                <Input
+                  id="q"
+                  defaultValue={q || ""}
+                  aria-label="Search contacts"
+                  className={searching ? "loading" : ""}
+                  placeholder="Search"
+                  type="search"
+                  name="q"
+                  leftComponent={
+                    searching ? (
+                      <div aria-hidden={!searching} id="search-spinner" />
+                    ) : (
+                      <div id="search-spinner" aria-hidden hidden={true} />
+                    )
+                  }
+                />
+              </Form>
+              <Form method="post">
+                <Button type="submit">New</Button>
+              </Form>
+            </div>
+            <nav>
+              {contacts.length ? (
+                <ul>
+                  {contacts.map((contact) => (
+                    <li key={contact.id}>
+                      <NavLink
+                        className={({ isActive, isPending }) =>
+                          isActive ? "active" : isPending ? "pending" : ""
+                        }
+                        to={`contacts/${contact.id}`}
+                      >
+                        {contact.first || contact.last ? (
+                          <>
+                            {contact.first} {contact.last}
+                          </>
+                        ) : (
+                          <i>No Name</i>
+                        )}{" "}
+                        {contact.favorite ? <span>★</span> : null}
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>
+                  <i>No contacts</i>
+                </p>
+              )}
+            </nav>
+          </aside>
+          <div
+            id="detail"
+            className={
+              navigation.state === "loading" && !searching ? "loading" : ""
+            }
+          >
+            <Outlet />
           </div>
-          <nav>
-            {contacts.length ? (
-              <ul>
-                {contacts.map((contact) => (
-                  <li key={contact.id}>
-                    <NavLink
-                      className={({ isActive, isPending }) =>
-                        isActive ? "active" : isPending ? "pending" : ""
-                      }
-                      to={`contacts/${contact.id}`}
-                    >
-                      {contact.first || contact.last ? (
-                        <>
-                          {contact.first} {contact.last}
-                        </>
-                      ) : (
-                        <i>No Name</i>
-                      )}{" "}
-                      {contact.favorite ? <span>★</span> : null}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>
-                <i>No contacts</i>
-              </p>
-            )}
-          </nav>
-        </aside>
-        <div
-          id="detail"
-          className={
-            navigation.state === "loading" && !searching ? "loading" : ""
-          }
-        >
-          <Outlet />
-        </div>
-        <ScrollRestoration />
-        <Scripts />
+          <ScrollRestoration />
+          <Scripts />
+          <Toaster />
+        </PoluiProvider>
       </body>
     </html>
   );
