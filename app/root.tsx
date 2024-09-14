@@ -1,28 +1,26 @@
-import {
-  Form,
-  Links,
-  Meta,
-  Scripts,
-  NavLink,
-  ScrollRestoration,
-  Outlet,
-  useNavigation,
-  useLoaderData,
-  useSubmit,
-} from "@remix-run/react";
-import { createEmptyContact, getContacts } from "./data";
-import { json, redirect } from "@remix-run/node";
-
 import type {
   LinksFunction,
   LoaderFunctionArgs,
   MetaFunction,
 } from "@remix-run/node";
 
-import appStylesHref from "./app.css?url";
-import { useEffect } from "react";
+import { json } from "@remix-run/node";
 import {
-  Button,
+  Form,
+  Links,
+  Meta,
+  NavLink,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  useLoaderData,
+  useNavigation,
+  useSubmit,
+} from "@remix-run/react";
+import { getContacts } from "./data";
+
+import {
+  cn,
   Input,
   Link,
   PoluiProvider,
@@ -31,12 +29,8 @@ import {
   ResizablePanelGroup,
   Toaster,
 } from "pol-ui";
-
-//
-export const action = async () => {
-  const contact = await createEmptyContact();
-  return redirect(`/contacts/${contact.id}/edit`);
-};
+import { useEffect } from "react";
+import appStylesHref from "./app.css?url";
 
 //
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -94,12 +88,15 @@ export default function App() {
       <body>
         <PoluiProvider>
           <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel minSize={15}>
-              <aside className="p-6 w-full bg-secondary-100 flex flex-col gap-6 @container">
-                <h1>
-                  <Link href="/">Logjam</Link>
-                </h1>
-                <div className="@[17.5rem]:bg-red-300 bg-blue-700 ">
+            <ResizablePanel minSize={15} defaultSize={20}>
+              <aside className="flex w-full flex-col gap-6 bg-secondary-100 p-3 @container/sidebar">
+                <header className="flex items-center justify-between gap-2">
+                  <h1>
+                    <Link href="/">Logjam</Link>
+                  </h1>
+                </header>
+
+                <div className="flex flex-col gap-4">
                   <Form
                     id="search-form"
                     role="search"
@@ -127,9 +124,6 @@ export default function App() {
                       }
                     />
                   </Form>
-                  <Form method="post">
-                    <Button type="submit">New</Button>
-                  </Form>
                 </div>
                 <nav>
                   {contacts.length ? (
@@ -138,7 +132,15 @@ export default function App() {
                         <li key={contact.id}>
                           <NavLink
                             className={({ isActive, isPending }) =>
-                              isActive ? "active" : isPending ? "pending" : ""
+                              cn(
+                                "@xs/sidebar:text-base flex w-full overflow-hidden truncate text-ellipsis whitespace-nowrap rounded-lg p-2 text-sm",
+                                {
+                                  "font-bold": contact.favorite,
+                                  "bg-secondary-300": isActive,
+                                  "hover:bg-secondary-200": !isActive,
+                                  "opacity-75": isPending,
+                                },
+                              )
                             }
                             to={`contacts/${contact.id}`}
                           >
@@ -163,7 +165,7 @@ export default function App() {
               </aside>
             </ResizablePanel>
             <ResizableHandle withHandle />
-            <ResizablePanel>
+            <ResizablePanel minSize={50}>
               <div
                 id="detail"
                 className={
