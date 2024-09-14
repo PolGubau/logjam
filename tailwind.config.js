@@ -10,5 +10,5 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [poluiPlugin()],
+  plugins: [poluiPlugin(), "@tailwindcss/container-queries"],
 };

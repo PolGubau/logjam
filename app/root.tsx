@@ -21,7 +21,16 @@ import type {
 
 import appStylesHref from "./app.css?url";
 import { useEffect } from "react";
-import { Button, Input, Link, PoluiProvider, Toaster } from "pol-ui";
+import {
+  Button,
+  Input,
+  Link,
+  PoluiProvider,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  Toaster,
+} from "pol-ui";
 
 //
 export const action = async () => {
@@ -84,80 +93,88 @@ export default function App() {
       </head>
       <body>
         <PoluiProvider>
-          <aside id="sidebar">
-            <h1>
-              <Link href="/">Logjam</Link>
-            </h1>
-            <div>
-              <Form
-                id="search-form"
-                role="search"
-                onChange={(event) => {
-                  const isFirstSearch = q === null;
-                  submit(event.currentTarget, {
-                    replace: !isFirstSearch,
-                  });
-                }}
-              >
-                <Input
-                  id="q"
-                  defaultValue={q || ""}
-                  aria-label="Search contacts"
-                  className={searching ? "loading" : ""}
-                  placeholder="Search"
-                  type="search"
-                  name="q"
-                  leftComponent={
-                    searching ? (
-                      <div aria-hidden={!searching} id="search-spinner" />
-                    ) : (
-                      <div id="search-spinner" aria-hidden hidden={true} />
-                    )
-                  }
-                />
-              </Form>
-              <Form method="post">
-                <Button type="submit">New</Button>
-              </Form>
-            </div>
-            <nav>
-              {contacts.length ? (
-                <ul>
-                  {contacts.map((contact) => (
-                    <li key={contact.id}>
-                      <NavLink
-                        className={({ isActive, isPending }) =>
-                          isActive ? "active" : isPending ? "pending" : ""
-                        }
-                        to={`contacts/${contact.id}`}
-                      >
-                        {contact.first || contact.last ? (
-                          <>
-                            {contact.first} {contact.last}
-                          </>
+          <ResizablePanelGroup direction="horizontal">
+            <ResizablePanel minSize={15}>
+              <aside className="p-6 w-full bg-secondary-100 flex flex-col gap-6 @container">
+                <h1>
+                  <Link href="/">Logjam</Link>
+                </h1>
+                <div className="@[17.5rem]:bg-red-300 bg-blue-700 ">
+                  <Form
+                    id="search-form"
+                    role="search"
+                    onChange={(event) => {
+                      const isFirstSearch = q === null;
+                      submit(event.currentTarget, {
+                        replace: !isFirstSearch,
+                      });
+                    }}
+                  >
+                    <Input
+                      id="q"
+                      defaultValue={q || ""}
+                      aria-label="Search contacts"
+                      className={searching ? "loading" : ""}
+                      placeholder="Search"
+                      type="search"
+                      name="q"
+                      leftComponent={
+                        searching ? (
+                          <div aria-hidden={!searching} id="search-spinner" />
                         ) : (
-                          <i>No Name</i>
-                        )}{" "}
-                        {contact.favorite ? <span>★</span> : null}
-                      </NavLink>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>
-                  <i>No contacts</i>
-                </p>
-              )}
-            </nav>
-          </aside>
-          <div
-            id="detail"
-            className={
-              navigation.state === "loading" && !searching ? "loading" : ""
-            }
-          >
-            <Outlet />
-          </div>
+                          <div id="search-spinner" aria-hidden hidden={true} />
+                        )
+                      }
+                    />
+                  </Form>
+                  <Form method="post">
+                    <Button type="submit">New</Button>
+                  </Form>
+                </div>
+                <nav>
+                  {contacts.length ? (
+                    <ul>
+                      {contacts.map((contact) => (
+                        <li key={contact.id}>
+                          <NavLink
+                            className={({ isActive, isPending }) =>
+                              isActive ? "active" : isPending ? "pending" : ""
+                            }
+                            to={`contacts/${contact.id}`}
+                          >
+                            {contact.first || contact.last ? (
+                              <>
+                                {contact.first} {contact.last}
+                              </>
+                            ) : (
+                              <i>No Name</i>
+                            )}{" "}
+                            {contact.favorite ? <span>★</span> : null}
+                          </NavLink>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>
+                      <i>No contacts</i>
+                    </p>
+                  )}
+                </nav>
+              </aside>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel>
+              <div
+                id="detail"
+                className={
+                  navigation.state === "loading" && !searching ? "loading" : ""
+                }
+              >
+                <Outlet />
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+
           <ScrollRestoration />
           <Scripts />
           <Toaster />
